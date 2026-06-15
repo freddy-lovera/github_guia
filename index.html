@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subir tu página a GitHub – Guía para Estudiantes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0c0a09;
+      --surface:   #1c1917;
+      --card:      #292524;
+      --border:    #44403c;
+      --accent:    #f59e0b;
+      --accent2:   #e11d48;
+      --warn:      #f97316;
+      --success:   #10b981;
+      --text:      #fafaf9;
+      --muted:     #a8a29e;
+      --code-bg:   #0a0807;
+      --font-main: 'Inter', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    ::selection { background: var(--accent); color: #000; }
+
+    .hero {
+      background: linear-gradient(160deg, #0c0a09 0%, #1c1010 40%, #1a0e0a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 64px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(245,158,11,.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(225,29,72,.06) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero > * { position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245,158,11,.1);
+      border: 1px solid rgba(245,158,11,.25);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.12;
+      max-width: 680px;
+      margin: 0 auto 16px;
+      letter-spacing: -0.03em;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: var(--muted);
+      max-width: 550px;
+      margin: 0 auto 32px;
+      font-size: 1.05rem;
+    }
+    .hero-pills { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .pill {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .pill strong { color: var(--text); }
+
+    .progress-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(12,10,9,.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .progress-label { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: .05em; white-space: nowrap; }
+    .progress-dots {
+      flex: 1;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .progress-dot {
+      flex: 1;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--border);
+      transition: background .4s;
+    }
+    .progress-dot.filled { background: var(--accent); }
+    .progress-count { font-size: 12px; color: var(--text); font-weight: 700; white-space: nowrap; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 200px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 52px;
+      height: calc(100vh - 52px);
+      overflow-y: auto;
+      padding: 32px 0 32px 24px;
+      border-left: 1px solid var(--border);
+      order: 1;
+    }
+    .sidebar-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 0 14px 16px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+      border-right: 2px solid transparent;
+      text-decoration: none;
+      border-radius: 0 8px 8px 0;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,.03); }
+    .nav-item.active { color: var(--accent); border-right-color: var(--accent); background: rgba(245,158,11,.06); }
+    .nav-item .num {
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--border);
+      border-radius: 6px;
+      padding: 1px 7px;
+      min-width: 24px;
+      text-align: center;
+      transition: background .3s, color .3s;
+    }
+    .nav-item.done .num { background: var(--accent); color: #000; }
+
+    .main { padding: 40px 48px 80px 0; }
+
+    .step-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--border);
+      border-radius: 0 16px 16px 0;
+      margin-bottom: 24px;
+      overflow: hidden;
+      transition: border-color .3s, border-left-color .3s;
+      scroll-margin-top: 70px;
+    }
+    .step-card.done {
+      border-color: rgba(245,158,11,.3);
+      border-left-color: var(--accent);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 22px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .step-number {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--muted);
+      min-width: 32px;
+      transition: color .3s;
+      font-feature-settings: "tnum";
+    }
+    .step-card.done .step-number { color: var(--accent); }
+    .step-info { flex: 1; }
+    .step-info h2 { font-size: 1rem; font-weight: 700; margin-bottom: 1px; letter-spacing: -0.02em; }
+    .step-info p { font-size: 13px; color: var(--muted); }
+    .step-toggle {
+      font-size: 16px;
+      color: var(--muted);
+      transition: transform .3s;
+      opacity: .5;
+    }
+    .step-card.open .step-toggle { transform: rotate(180deg); opacity: 1; }
+
+    .step-body {
+      display: none;
+      padding: 0 22px 22px;
+      border-top: 1px solid var(--border);
+    }
+    .step-card.open .step-body { display: block; }
+
+    .explain {
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 16px 0 12px;
+      font-size: 14px;
+      color: #d6d3d1;
+    }
+    .explain strong { color: var(--accent); }
+
+    .tip {
+      background: rgba(249,115,22,.06);
+      border: 1px solid rgba(249,115,22,.15);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #fdba74;
+      margin: 12px 0;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .tip .icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+
+    .success-note {
+      background: rgba(16,185,129,.06);
+      border: 1px solid rgba(16,185,129,.15);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #6ee7b7;
+      margin: 12px 0;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .success-note .icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 14px;
+      background: rgba(255,255,255,.02);
+      border-bottom: 1px solid var(--border);
+    }
+    .code-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 3px 10px;
+      transition: all .2s;
+      font-family: var(--font-main);
+      font-weight: 500;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .copy-btn.copied { border-color: var(--success); color: var(--success); }
+    pre {
+      padding: 14px 16px;
+      font-family: var(--font-code);
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+    pre code { color: #e7e5e4; }
+    .kw  { color: #fb7185; }
+    .str { color: #34d399; }
+    .cmt { color: #57534e; font-style: italic; }
+    .cmd { color: #fbbf24; }
+    .out { color: #a8a29e; }
+    .num { color: #a78bfa; }
+
+    .check-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 18px;
+      background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.25);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: var(--font-main);
+    }
+    .check-btn:hover { background: rgba(245,158,11,.15); transform: translateY(-1px); }
+    .check-btn.done-btn { background: rgba(16,185,129,.1); border-color: rgba(16,185,129,.25); color: var(--success); transform: none; }
+
+    .screencap {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 12px 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .screencap .title-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .screencap .dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+    }
+    .screencap .dot.r { background: #ff5f56; }
+    .screencap .dot.y { background: #ffbd2e; }
+    .screencap .dot.g { background: #27c93f; }
+
+    .steps-list { display: flex; flex-direction: column; gap: 14px; margin: 14px 0; }
+    .steps-list .step-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .step-bullet {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--text);
+    }
+
+    .final-banner {
+      background: linear-gradient(135deg, rgba(245,158,11,.06), rgba(225,29,72,.06));
+      border: 1px solid rgba(245,158,11,.15);
+      border-radius: 16px;
+      padding: 36px 32px;
+      text-align: center;
+      margin-top: 40px;
+    }
+    .final-banner h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+    .final-banner p { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
+    .final-emoji { font-size: 2.8rem; margin-bottom: 12px; display: block; }
+
+    .highlight { color: var(--accent); font-weight: 700; }
+    .btn-look { color: var(--accent2); font-weight: 600; }
+
+    .error-box {
+      background: rgba(225,29,72,.06);
+      border: 1px solid rgba(225,29,72,.15);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #fda4af;
+      margin: 12px 0;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .error-box .icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+
+    .see-result {
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 12px 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .see-result strong { color: var(--text); }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main { padding: 24px 16px 60px; }
+      .hero { padding: 40px 16px 36px; }
+      .hero h1 { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+      .step-header { padding: 14px 16px; gap: 12px; }
+      .step-body { padding: 0 16px 16px; }
+      .step-info h2 { font-size: 0.93rem; }
+      .step-number { font-size: 1.1rem; min-width: 24px; }
+      .final-banner { padding: 28px 20px; }
+      pre { font-size: 12px; padding: 12px; }
+      .explain { font-size: 13px; }
+      .see-result { font-size: 12px; padding: 12px 14px; }
+      .step-item { gap: 10px; }
+      .step-bullet { width: 24px; height: 24px; font-size: 11px; }
+    }
+
+    @media (max-width: 480px) {
+      .step-toggle { font-size: 14px; }
+      .check-btn { width: 100%; justify-content: center; }
+      .hero p { font-size: 0.95rem; }
+      .progress-wrap { padding: 10px 14px; gap: 10px; }
+      .progress-label { font-size: 10px; }
+      .progress-count { font-size: 10px; }
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+  </style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-badge">🚀 Publica tu sitio web</div>
+  <h1>Sube tu página a Internet con<br><span>GitHub Pages</span></h1>
+  <p>Desde cero: crea tu cuenta en GitHub, sube tu primer archivo HTML y comparte el link con tus amigos. Sin conocimientos previos. Paso a paso, sin saltarte nada.</p>
+  <div class="hero-pills">
+    <div class="pill">⏱ <strong>~20 min</strong></div>
+    <div class="pill">🪟 · 🍎 · 🐧</div>
+    <div class="pill">🎯 Para estudiantes</div>
+    <div class="pill">📦 7 pasos</div>
+  </div>
+</header>
+
+<div class="progress-wrap">
+  <span class="progress-label">Progreso</span>
+  <div class="progress-dots" id="progressDots">
+    <div class="progress-dot" data-idx="0"></div>
+    <div class="progress-dot" data-idx="1"></div>
+    <div class="progress-dot" data-idx="2"></div>
+    <div class="progress-dot" data-idx="3"></div>
+    <div class="progress-dot" data-idx="4"></div>
+    <div class="progress-dot" data-idx="5"></div>
+    <div class="progress-dot" data-idx="6"></div>
+  </div>
+  <span class="progress-count" id="progressCount">0/7</span>
+</div>
+
+<div class="layout">
+
+  <main class="main">
+
+    <!-- GLOSARIO -->
+    <div style="margin-bottom: 32px;">
+      <div style="font-size: 10px; font-weight: 800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:12px;">📖 Vocabulario clave</div>
+      <div class="screencap" style="padding:14px 16px;">
+        <p style="margin-bottom:6px;"><strong style="color:var(--accent);">GitHub</strong> — Una página web donde los programadores guardan sus proyectos. Es como Google Drive, pero especial para código.</p>
+        <p style="margin-bottom:6px;"><strong style="color:var(--accent);">Repositorio (repo)</strong> — La "carpeta" de tu proyecto en GitHub. Ahí dentro viven tus archivos HTML, CSS, imágenes, etc.</p>
+        <p style="margin-bottom:6px;"><strong style="color:var(--accent);">GitHub Pages</strong> — Un servicio GRATIS de GitHub que publica tu repositorio como una página web. Cualquiera puede verla con un link.</p>
+        <p style="margin-bottom:6px;"><strong style="color:var(--accent);">README.md</strong> — Un archivo donde escribes una descripción de tu proyecto. Se muestra automáticamente en la página principal de tu repo.</p>
+        <p style="margin-bottom:6px;"><strong style="color:var(--accent);">Commit</strong> — Es como presionar "Guardar" en un videojuego. Cada commit guarda los cambios que hiciste.</p>
+        <p><strong style="color:var(--accent);">URL / Link</strong> — La dirección web (ej: https://tunombre.github.io/mi-pagina/) que compartes para que otros vean tu página.</p>
+      </div>
+    </div>
+
+    <!-- ══ PASO 0 ══ -->
+    <div class="step-card open" id="step-0">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-number">00</div>
+        <div class="step-info">
+          <h2>Crear una cuenta en GitHub</h2>
+          <p>Regístrate gratis. Sin esto no puedes usar GitHub Pages.</p>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="explain">
+          <strong>¿Para qué sirve este paso?</strong> Necesitas una cuenta en GitHub para poder crear repositorios y publicar páginas. Es como crear una cuenta en Instagram o TikTok, pero para programar. Es <strong>totalmente gratis</strong> y no necesitas tarjeta de crédito.
+        </div>
+
+        <p style="font-weight:600; margin:14px 0 6px; font-size:14px;">🔽 Sigue estos pasos EN ORDEN:</p>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-bullet">1</div>
+            <div>
+              <strong>Abre Google Chrome, Edge o Firefox</strong> (el navegador que uses normalmente).<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Si no sabes qué es un navegador: es el programa donde ves páginas web, el icono azul de "e" o el de colores.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">2</div>
+            <div>
+              En la barra de direcciones (arriba del todo), escribe: <strong>github.com</strong> y presiona Enter.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Te aparecerá una página con un fondo oscuro y muchas letras.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">3</div>
+            <div>
+              Busca y haz clic en el botón <span class="btn-look">«Sign up»</span> que está en la esquina superior derecha.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Sign up significa "Registrarse" en inglés.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">4</div>
+            <div>
+              <strong>Completa el formulario de registro:</strong>
+              <div style="margin-top:8px;background:var(--bg);border-radius:8px;padding:12px 14px;font-size:13px;">
+                📧 <strong>Email:</strong> tu correo electrónico (el que usas en el colegio o tu correo personal)<br>
+                🔑 <strong>Password:</strong> una contraseña que recuerdes (mínimo 8 caracteres)<br>
+                👤 <strong>Username:</strong> tu nombre de usuario (elige algo como <span class="highlight">tu-nombre</span> o <span class="highlight">tu-apellido</span>)<br>
+                <span style="color:var(--muted);font-size:12px;">⚠️ El nombre de usuario debe ser ÚNICO. Si el que quieres ya lo usa otra persona, prueba con otra combinación.</span>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">5</div>
+            <div>
+              GitHub te pedirá que resuelvas un <strong>puzzle de verificación</strong> (arrastrar una figura hasta su lugar). Esto es para confirmar que no eres un robot.
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">6</div>
+            <div>
+              Te llegará un <strong>código de verificación</strong> al correo electrónico que registraste.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Abre tu correo (Gmail, Outlook, etc.), busca el mensaje de GitHub y copia el código de 6 dígitos.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">7</div>
+            <div>
+              Escribe ese código en la página de GitHub y presiona Enter.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Si no encuentras el correo, revisa la carpeta de SPAM o Correo no deseado.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="see-result">
+          <strong>🔍 Así debería verse:</strong> Una vez verificada tu cuenta, GitHub te mostrará una página de bienvenida con algunas preguntas (puedes saltarlas haciendo clic en "Skip personalization"). Luego verás tu <strong>dashboard</strong> (panel principal) de GitHub.
+        </div>
+
+        <div class="screencap">
+          <div class="title-bar">
+            <div class="dot r"></div>
+            <div class="dot y"></div>
+            <div class="dot g"></div>
+            <span style="margin-left:12px;font-size:11px;">github.com - Panel principal (dashboard)</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;padding:6px 0;">
+            <div style="background:var(--bg);border-radius:6px;padding:10px;text-align:center;font-size:12px;">
+              🎉 ¡Bienvenido a GitHub, <span style="color:var(--accent);">tu-usuario</span>!<br>
+              <span style="font-size:11px;color:var(--muted);">Este es tu panel de control. Aquí verás tus repositorios.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip"><span class="icon">💡</span><span><strong>Recomendación importante:</strong> Elige un nombre de usuario que puedas poner en tu currículum. Ejemplos buenos: <code>ana-perez</code>, <code>carlos-martin</code>, <code>sofia-dev</code>. Evita: <code>xXpro_gamerXx</code>, <code>messi_10_fan</code>.</span></div>
+
+        <div class="error-box"><span class="icon">⚠️</span><span><strong>Error común:</strong> Si te dice "Username already taken" significa que ese nombre ya lo usa otra persona. Prueba agregando un número o tu segundo apellido. Ej: <code>ana-perez23</code>.</span></div>
+
+        <div class="success-note"><span class="icon">✅</span><span><strong>¡Cuenta creada exitosamente!</strong> Tu perfil público es: <span class="highlight">github.com/tu-usuario</span></span></div>
+
+        <button class="check-btn" onclick="markDone(this, 0)">✔ Completé este paso</button>
+      </div>
+    </div>
+
+    <!-- ══ PASO 1 ══ -->
+    <div class="step-card" id="step-1">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-number">01</div>
+        <div class="step-info">
+          <h2>Crear un repositorio nuevo</h2>
+          <p>El repositorio es la "carpeta" donde vivirán los archivos de tu página.</p>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="explain">
+          <strong>¿Qué es un repositorio y por qué lo necesito?</strong> Imagina que GitHub es un edificio de departamentos. Tu <strong>repositorio</strong> es tu departamento: ahí guardas tus cosas (tus archivos HTML, CSS, imágenes). Sin repositorio, no puedes publicar nada.
+        </div>
+
+        <p style="font-weight:600; margin:14px 0 6px; font-size:14px;">🔽 Crea tu primer repositorio:</p>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-bullet">1</div>
+            <div><strong>Abre github.com</strong> y asegúrate de haber iniciado sesión (tu foto de perfil debe aparecer arriba a la derecha).</div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">2</div>
+            <div>
+              <strong>Busca el botón verde «New»</strong> y haz clic en él. O una forma más fácil: escribe directamente en la barra del navegador: <strong>github.com/new</strong> y presiona Enter.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 El botón «New» está al lado izquierdo, arriba de la lista de repositorios, tiene un icono 📕.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">3</div>
+            <div>
+              Se abrirá un formulario. En el campo <strong>«Repository name»</strong> (nombre del repositorio) escribe el nombre de tu proyecto. Ejemplo:<br>
+              <div style="margin-top:6px;background:var(--bg);border-radius:6px;padding:8px 12px;font-family:var(--font-code);font-size:13px;color:var(--accent);display:inline-block;">mi-primera-pagina</div>
+              <div class="tip" style="margin:8px 0 0;font-size:12px;padding:8px 12px;"><span class="icon">⚠️</span><strong>Reglas del nombre:</strong> SIN espacios, SIN mayúsculas, SIN caracteres especiales (ñ, tildes). Usa guiones <code>-</code> para separar palabras.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">4</div>
+            <div>
+              <strong>Elige la visibilidad:</strong> Más abajo verás dos opciones: <strong>«Public»</strong> y <strong>«Private»</strong>. Selecciona <span class="btn-look">«Public»</span>.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 «Public» significa que cualquiera puede ver tu página. «Private» es solo para ti. Para GitHub Pages necesitas que sea Público.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">5</div>
+            <div>
+              <strong>Marca la casilla</strong> que dice <strong>«Add a README file»</strong>. Esto crea un archivo de presentación para tu proyecto.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 README es como la "portada" de tu proyecto. Ahí puedes escribir de qué trata.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">6</div>
+            <div>
+              <strong>Haz clic en el botón verde</strong> <span class="btn-look">«Create repository»</span> que está al final del formulario.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 No toques ninguna otra opción. Solo nombre, público, README y crear.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="see-result">
+          <strong>🔍 Así debería verse:</strong> Después de hacer clic en «Create repository», GitHub te llevará a la página de tu repositorio. Arriba deberías ver algo como: <span class="highlight">tu-usuario/mi-primera-pagina</span>. Abajo debe aparecer el archivo <code>README.md</code> que se creó automáticamente.
+        </div>
+
+        <div class="screencap">
+          <div class="title-bar">
+            <div class="dot r"></div>
+            <div class="dot y"></div>
+            <div class="dot g"></div>
+            <span style="margin-left:12px;font-size:11px;">github.com/tu-usuario/mi-primera-pagina</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;padding:6px 0;font-size:12px;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="color:var(--accent);font-weight:700;">⬆</span>
+              <span>Aquí dice: <strong>tu-usuario / mi-primera-pagina</strong> (nombre del repo)</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="background:var(--success);width:10px;height:10px;border-radius:50%;display:inline-block;"></span>
+              <span>Marca «Public» visible</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="font-size:14px;">📄</span>
+              <span>Archivo <code>README.md</code> ya creado (lo ves en la lista de archivos)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="success-note"><span class="icon">✅</span><span><strong>¡Repositorio creado!</strong> Ahora tienes tu carpeta en la nube. En los siguientes pasos vamos a llenarla con los archivos de tu página web.</span></div>
+
+        <button class="check-btn" onclick="markDone(this, 1)">✔ Completé este paso</button>
+      </div>
+    </div>
+
+    <!-- ══ PASO 2 ══ -->
+    <div class="step-card" id="step-2">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-number">02</div>
+        <div class="step-info">
+          <h2>Preparar tu archivo index.html</h2>
+          <p>Tu página principal debe llamarse exactamente index.html.</p>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="explain">
+          <strong>¿Por qué index.html?</strong> GitHub Pages (y todos los servidores web del mundo) buscan automáticamente un archivo llamado <strong><code>index.html</code></strong> para mostrar la página principal. Si tu archivo se llama <code>pagina.html</code> o <code>inicio.html</code>, NO funcionará. Debe llamarse EXACTAMENTE <code>index.html</code>, todo en minúsculas.
+        </div>
+
+        <p style="font-weight:600; margin:14px 0 6px; font-size:14px;">🔽 Crea tu archivo index.html:</p>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-bullet">1</div>
+            <div>
+              <strong>Abre el Bloc de Notas</strong> (Windows) o cualquier editor de texto.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 En Windows: presiona la tecla Windows, escribe "Bloc de notas" y haz clic. También puedes usar VS Code si lo tienes instalado.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">2</div>
+            <div>
+              <strong>Copia y pega el siguiente código</strong> exactamente como está aquí abajo:
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">código para copiar</span><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+          <pre><code><span class="kw">&lt;!DOCTYPE html&gt;</span>
+<span class="kw">&lt;html</span> <span class="kw">lang</span>=<span class="str">"es"</span><span class="kw">&gt;</span>
+<span class="kw">&lt;head&gt;</span>
+    <span class="kw">&lt;meta</span> <span class="kw">charset</span>=<span class="str">"UTF-8"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;meta</span> <span class="kw">name</span>=<span class="str">"viewport"</span>
+          <span class="kw">content</span>=<span class="str">"width=device-width, initial-scale=1.0"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;title&gt;</span>Mi primera página web<span class="kw">&lt;/title&gt;</span>
+<span class="kw">&lt;/head&gt;</span>
+<span class="kw">&lt;body&gt;</span>
+    <span class="kw">&lt;h1&gt;</span>¡Hola, mundo!<span class="kw">&lt;/h1&gt;</span>
+    <span class="kw">&lt;p&gt;</span>Esta es mi primera página publicada en Internet.<span class="kw">&lt;/p&gt;</span>
+    <span class="kw">&lt;p&gt;</span>Hecha por <strong>[ESCRIBE TU NOMBRE AQUÍ]</strong> 🚀<span class="kw">&lt;/p&gt;</span>
+<span class="kw">&lt;/body&gt;</span>
+<span class="kw">&lt;/html&gt;</span></code></pre>
+        </div>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-bullet">3</div>
+            <div>
+              En el código, cambia <strong><code>[ESCRIBE TU NOMBRE AQUÍ]</code></strong> por tu nombre real.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Por ejemplo: <code>Hecha por Ana Pérez 🚀</code></span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">4</div>
+            <div>
+              <strong>Guarda el archivo:</strong> Presiona <strong>Ctrl + S</strong> (o ve a Archivo → Guardar como). En la ventana que aparece:
+              <div style="margin-top:8px;background:var(--bg);border-radius:8px;padding:12px 14px;font-size:13px;">
+                1️⃣ En <strong>"Tipo"</strong> selecciona <span class="highlight">"Todos los archivos (*.*)"</span><br>
+                2️⃣ En <strong>"Nombre"</strong> escribe exactamente: <span class="highlight">index.html</span><br>
+                3️⃣ Guarda en tu <strong>Escritorio</strong> para encontrarlo fácil después<br>
+                <span style="color:var(--muted);font-size:12px;">⚠️ Es MUY importante que selecciones "Todos los archivos", porque si no, el Bloc de Notas lo guardará como <code>index.html.txt</code> y NO funcionará.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-box"><span class="icon">⚠️</span><span><strong>Error común #1:</strong> Si el archivo se ve como <code>index.html.txt</code>, lo guardaste mal. Repite el paso 4 asegurándote de seleccionar "Todos los archivos" en el tipo.</span></div>
+        <div class="error-box"><span class="icon">⚠️</span><span><strong>Error común #2:</strong> Si el archivo se llama <code>Index.html</code> (con I mayúscula) puede dar problemas. Asegúrate de que sea <strong>todo en minúsculas</strong>: <code>index.html</code>.</span></div>
+
+        <div class="success-note"><span class="icon">💾</span><span>Archivo guardado correctamente. Ahora tienes un archivo <strong>index.html</strong> en tu Escritorio. Deberías ver un icono que se parece a un navegador web (Chrome o Edge). Si haces doble clic en él, se abrirá tu página en el navegador.</span></div>
+
+        <button class="check-btn" onclick="markDone(this, 2)">✔ Completé este paso</button>
+      </div>
+    </div>
+
+    <!-- ══ PASO 3 ══ -->
+    <div class="step-card" id="step-3">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-number">03</div>
+        <div class="step-info">
+          <h2>Subir tu index.html a GitHub</h2>
+          <p>Subes el archivo desde tu computadora al repositorio en la nube.</p>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="explain">
+          <strong>¿Qué vamos a hacer?</strong> Vas a tomar el archivo <code>index.html</code> que guardaste en tu Escritorio y lo vas a "subir" (copiar) a tu repositorio en GitHub. Así quedará guardado en Internet.
+        </div>
+
+        <p style="font-weight:600; margin:14px 0 6px; font-size:14px;">🔽 Sube tu archivo paso a paso:</p>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-bullet">1</div>
+            <div>
+              <strong>Abre tu repositorio</strong> en GitHub. Deberías estar en una página que se ve como: <span class="highlight">github.com/tu-usuario/mi-primera-pagina</span><br>
+              <span style="color:var(--muted);font-size:12px;">💡 Si no estás ahí, abre el navegador, ve a github.com y haz clic en tu repositorio «mi-primera-pagina».</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">2</div>
+            <div>
+              <strong>Busca el botón «Add file»</strong> (Agregar archivo). Está en la parte de arriba, del lado derecho, al lado del botón verde «Code». Haz clic en él.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Se abrirá un menú con dos opciones.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">3</div>
+            <div>
+              En el menú, haz clic en <span class="btn-look">«Upload files»</span> (Subir archivos).<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Upload files significa "Subir archivos" en inglés.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">4</div>
+            <div>
+              <strong>Arrastra tu archivo index.html</strong> desde tu Escritorio hasta el recuadro punteado que dice "Drag files here..." que aparece en el centro de la pantalla.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 También puedes hacer clic en "choose your files" y buscar el archivo en tu carpeta.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">5</div>
+            <div>
+              Verás que el archivo aparece listado con un icono 📄. <strong>Baja</strong> con el scroll hacia abajo.
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">6</div>
+            <div>
+              En el campo <strong>«Commit changes»</strong> escribe un mensaje corto que describa lo que subiste. Ejemplo:<br>
+              <div style="margin-top:6px;background:var(--bg);border-radius:6px;padding:8px 12px;font-family:var(--font-code);font-size:13px;color:var(--accent);display:inline-block;">Subo mi primera página web</div>
+              <span style="color:var(--muted);font-size:12px;display:block;margin-top:4px;">💡 "Commit" es como cuando le dices "Guardar" a un archivo. El mensaje te ayuda a recordar qué hiciste.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">7</div>
+            <div>
+              <strong>Haz clic en el botón verde</strong> <span class="btn-look">«Commit changes»</span> que está abajo del mensaje.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 No toques ninguna otra opción. Solo escribe el mensaje y presiona el botón verde.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="see-result">
+          <strong>🔍 Así debería verse:</strong> Después del clic, GitHub te llevará de vuelta a la página de tu repositorio. Ahora deberías ver <strong>dos archivos</strong> en la lista: <code>README.md</code> (el que se creó solo) y <strong><code>index.html</code></strong> (el que acabas de subir). ¡Felicidades, tu archivo ya está en la nube!
+        </div>
+
+        <div class="screencap">
+          <div class="title-bar">
+            <div class="dot r"></div>
+            <div class="dot y"></div>
+            <div class="dot g"></div>
+            <span style="margin-left:12px;font-size:11px;">Repositorio con archivos</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;padding:6px 0;font-size:12px;">
+            <div style="display:flex;gap:6px;align-items:center;padding:4px 8px;background:var(--bg);border-radius:4px;">
+              <span>📄</span><span style="color:var(--muted);">README.md</span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;padding:4px 8px;background:var(--bg);border-radius:4px;">
+              <span>📄</span><span style="color:var(--accent);font-weight:600;">index.html</span>
+              <span style="font-size:10px;color:var(--success);margin-left:auto;">✅ Subido ahora</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip"><span class="icon">📦</span><span><strong>¿Tienes más archivos?</strong> Si tu página tiene CSS (<code>estilo.css</code>), imágenes o JavaScript, puedes subirlos todos juntos. En el paso 4 (paso 4 de arrastrar), selecciona todos tus archivos a la vez y arrastra el grupo completo.</span></div>
+
+        <button class="check-btn" onclick="markDone(this, 3)">✔ Completé este paso</button>
+      </div>
+    </div>
+
+    <!-- ══ PASO 4 ══ -->
+    <div class="step-card" id="step-4">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-number">04</div>
+        <div class="step-info">
+          <h2>Activar GitHub Pages</h2>
+          <p>Le decimos a GitHub que convierta tu repositorio en una página web.</p>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="explain">
+          <strong>¿Qué estamos haciendo?</strong> Tu repositorio actualmente solo guarda archivos. GitHub Pages es un "interruptor" que le dice a GitHub: "Oye, los archivos de este repositorio quiero que se vean como una página web". Lo activas una sola vez y funciona para siempre.
+        </div>
+
+        <p style="font-weight:600; margin:14px 0 6px; font-size:14px;">🔽 Activa GitHub Pages:</p>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-bullet">1</div>
+            <div>
+              Dentro de tu repositorio, busca la pestaña <strong>«Settings»</strong> (Configuración) en la parte de arriba. Está al final del menú horizontal. Haz clic.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 El menú horizontal empieza con: Code, Issues, Pull Requests, ... y al final está Settings.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">2</div>
+            <div>
+              <strong>Mira el menú de la izquierda</strong> (es una lista vertical). Busca donde dice <strong>«Pages»</strong> y haz clic.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Pages está en la sección "Code and automation", más o menos en la mitad de la lista. Tiene un icono 📘.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">3</div>
+            <div>
+              Verás una sección que dice <strong>«Branch»</strong> (Rama). Por defecto dice «None». Haz clic en el menú desplegable que dice «None» y selecciona <span class="btn-look">«main»</span>.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 «main» es el nombre de la rama principal de tu repositorio. Ahí están tus archivos.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">4</div>
+            <div>
+              Al lado del menú de Branch hay otro menú que dice <strong>«/ (root)»</strong>. Déjalo así, no lo cambies.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 «/ (root)» significa "la raíz", o sea, la carpeta principal. Tus archivos están ahí.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">5</div>
+            <div>
+              <strong>Haz clic en el botón «Save»</strong> (Guardar). Está al lado del menú de Branch.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Es un botón gris con letras negras.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-box"><span class="icon">⚠️</span><span><strong>Atención:</strong> Si la opción «main» no aparece en el menú, significa que aún no has subido ningún archivo al repositorio. Vuelve al paso 3 y asegúrate de haber subido el <code>index.html</code> correctamente.</span></div>
+
+        <div class="see-result">
+          <strong>🔍 Así debería verse:</strong> Después de guardar, la página se recargará y verás un mensaje <strong>amarillo</strong> que dice: <span class="highlight">"Your site is being deployed"</span> (Tu sitio se está publicando). También verás una URL parecida a: <span class="highlight">https://tu-usuario.github.io/mi-primera-pagina/</span>
+        </div>
+
+        <div class="screencap">
+          <div class="title-bar">
+            <div class="dot r"></div>
+            <div class="dot y"></div>
+            <div class="dot g"></div>
+            <span style="margin-left:12px;font-size:11px;">Settings → Pages</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;padding:6px 0;font-size:12px;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="min-width:70px;">Branch:</span>
+              <div style="background:var(--border);width:90px;height:26px;border-radius:4px;display:flex;align-items:center;padding:0 8px;gap:4px;">
+                <span style="background:var(--accent);width:8px;height:8px;border-radius:50%;display:inline-block;"></span>
+                main
+                <span style="margin-left:auto;font-size:10px;">▼</span>
+              </div>
+              <span style="margin-left:4px;">/ (root)</span>
+              <div style="background:var(--muted);color:#000;padding:4px 10px;border-radius:6px;font-weight:600;font-size:11px;margin-left:8px;">Save</div>
+            </div>
+            <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:8px 12px;text-align:center;font-size:12px;color:var(--accent);">
+              ⏳ Your site is being deployed...<br>
+              <span style="font-size:11px;">(Tu sitio se está publicando. Espera 2-3 minutos)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="success-note"><span class="icon">⏳</span><span><strong>¡Ya casi!</strong> Apareció el mensaje amarillo. Ahora hay que esperar entre 1 y 3 minutos mientras GitHub prepara tu página. Puedes pasar al siguiente paso mientras tanto.</span></div>
+
+        <button class="check-btn" onclick="markDone(this, 4)">✔ Completé este paso</button>
+      </div>
+    </div>
+
+    <!-- ══ PASO 5 ══ -->
+    <div class="step-card" id="step-5">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-number">05</div>
+        <div class="step-info">
+          <h2>Visitar tu página publicada</h2>
+          <p>¡El gran momento! Ve tu página en Internet y comparte el link.</p>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="explain">
+          <strong>¡Llegó el momento que esperabas!</strong> Si esperaste al menos 2 minutos desde el paso anterior, tu página ya debería estar publicada. Vamos a comprobarlo.
+        </div>
+
+        <p style="font-weight:600; margin:14px 0 6px; font-size:14px;">🔽 Encuentra y abre tu página:</p>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-bullet">1</div>
+            <div>
+              <strong>Vuelve a Settings → Pages</strong> (donde estábamos en el paso anterior). O simplemente recarga la página si ya estás ahí.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Recargar = presionar F5 o el icono 🔄 del navegador.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">2</div>
+            <div>
+              Si la página ya está lista, verás un mensaje <strong>verde</strong> y un link. El link se ve así:<br>
+              <div style="margin-top:6px;background:var(--bg);border-radius:6px;padding:8px 12px;font-family:var(--font-code);font-size:14px;color:var(--accent);text-align:center;">
+                https://tu-usuario.github.io/mi-primera-pagina/
+              </div>
+              <span style="color:var(--muted);font-size:12px;">💡 "tu-usuario" es el nombre de usuario que elegiste al registrarte.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">3</div>
+            <div>
+              <strong>Haz clic en ese link</strong> o cópialo (selecciónalo, Ctrl+C) y pégalo en una nueva pestaña del navegador (Ctrl+V en la barra de direcciones y Enter).<br>
+              <span style="color:var(--muted);font-size:12px;">💡 El link se abrirá en una nueva pestaña y deberías ver tu página.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="see-result">
+          <strong>🔍 Así debería verse tu página:</strong> Una página blanca o con fondo oscuro (depende del código que usaste) que dice:<br>
+          <div style="text-align:center;padding:14px;background:var(--bg);border-radius:8px;margin-top:8px;">
+            <div style="font-size:1.4rem;font-weight:700;">¡Hola, mundo!</div>
+            <div style="color:var(--muted);font-size:13px;">Esta es mi primera página publicada en Internet.</div>
+            <div style="color:var(--muted);font-size:13px;margin-top:4px;">Hecha por <strong style="color:var(--accent);">[Tu Nombre]</strong> 🚀</div>
+          </div>
+        </div>
+
+        <div class="error-box"><span class="icon">⚠️</span><span><strong>Error común: página no encontrada (404)</strong> Si ves una página que dice "404 Not Found", significa que GitHub aún no terminó de publicar. Espera 2 minutos más y recarga la página (F5). Si después de 5 minutos sigue sin funcionar, verifica que tu archivo se llame EXACTAMENTE <code>index.html</code> y que esté en la raíz del repositorio.</span></div>
+
+        <div class="success-note"><span class="icon">🎉</span><span><strong>¡YA TIENES UNA PÁGINA EN INTERNET!</strong> Cualquier persona en el mundo puede verla escribiendo ese link en su navegador. Compártelo con tus amigos, familiares, o por WhatsApp. Pueden abrirlo desde el celular, la tablet o la computadora.</span></div>
+
+        <div class="tip"><span class="icon">📱</span><span><strong>Pruébalo ahora mismo en tu celular:</strong> Coge tu teléfono, abre WhatsApp, envíate a ti mismo el link, y haz clic en él. Verás tu página aparecer en la pantalla de tu celular. ¡Comparte el link con quien quieras!</span></div>
+
+        <button class="check-btn" onclick="markDone(this, 5)">✔ Completé este paso</button>
+      </div>
+    </div>
+
+    <!-- ══ PASO 6 ══ -->
+    <div class="step-card" id="step-6">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-number">06</div>
+        <div class="step-info">
+          <h2>Cómo actualizar tu página después</h2>
+          <p>Si quieres cambiar algo, editas el archivo y los cambios se publican solos.</p>
+        </div>
+        <div class="step-toggle">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="explain">
+          <strong>Lo mejor de todo:</strong> Una vez que activaste GitHub Pages (paso 4), cada vez que subas cambios a tu repositorio, la página se actualiza automáticamente. No necesitas volver a activar nada. Es totalmente automático.
+        </div>
+
+        <p style="font-weight:600; margin:14px 0 6px; font-size:14px;">🔽 Para modificar tu página más adelante:</p>
+
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-bullet">1</div>
+            <div>
+              <strong>Abre tu repositorio</strong> en GitHub: <span class="highlight">github.com/tu-usuario/mi-primera-pagina</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">2</div>
+            <div>
+              <strong>Haz clic en el archivo</strong> que quieras modificar. Por ejemplo: <code>index.html</code>.
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">3</div>
+            <div>
+              Se abrirá una vista del contenido del archivo. Arriba a la derecha verás un <strong>icono de lápiz ✏️</strong>. Haz clic en él.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 El lápiz significa "Editar". Si pasas el mouse por encima, dice "Edit this file".</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">4</div>
+            <div>
+              El archivo se abrirá en modo edición. <strong>Cambia el código</strong> directamente en el navegador. Por ejemplo, cambia el texto del título o agrega un nuevo párrafo.
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">5</div>
+            <div>
+              <strong>Baja</strong> con el scroll hasta el final de la página. Verás un recuadro que dice <strong>«Commit changes»</strong>.
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">6</div>
+            <div>
+              Escribe un mensaje corto que describa lo que cambiaste. Ejemplo:<br>
+              <div style="margin-top:6px;background:var(--bg);border-radius:6px;padding:8px 12px;font-family:var(--font-code);font-size:13px;color:var(--accent);display:inline-block;">Actualicé el título de la página</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">7</div>
+            <div>
+              <strong>Haz clic en el botón verde</strong> <span class="btn-look">«Commit changes»</span>.<br>
+              <span style="color:var(--muted);font-size:12px;">💡 Hecho esto, GitHub guarda el cambio.</span>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-bullet">8</div>
+            <div>
+              <strong>Espera 1-2 minutos</strong> y recarga (F5) tu página web. Los cambios aparecerán solos.
+            </div>
+          </div>
+        </div>
+
+        <div class="see-result">
+          <strong>🔍 Después de editar:</strong> Tu página web se actualizará automáticamente. No necesitas hacer nada más. Solo esperar un par de minutos y recargar la página. ¡Así de fácil es mantener tu sitio actualizado!
+        </div>
+
+        <div class="screencap">
+          <div class="title-bar">
+            <div class="dot r"></div>
+            <div class="dot y"></div>
+            <div class="dot g"></div>
+            <span style="margin-left:12px;font-size:11px;">Editando index.html en GitHub</span>
+          </div>
+          <div style="padding:8px 0;font-size:12px;">
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;font-family:var(--font-code);font-size:11px;color:var(--muted);">
+              &lt;h1&gt;¡Hola, mundo!&lt;/h1&gt;<br>
+              &lt;p&gt;Esta página la actualicé yo mismo 🚀&lt;/p&gt;
+            </div>
+            <div style="margin-top:8px;background:var(--bg);border-radius:6px;padding:10px;">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Commit message</div>
+              <div style="background:var(--border);padding:6px 10px;border-radius:4px;font-size:11px;">Actualicé el título</div>
+            </div>
+            <div style="margin-top:6px;text-align:right;">
+              <span style="background:var(--success);color:#000;padding:4px 14px;border-radius:6px;font-weight:600;font-size:11px;">Commit changes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip"><span class="icon">🌈</span><span><strong>¿Quieres agregar más páginas?</strong> Puedes crear nuevos archivos HTML (ej: <code>contacto.html</code>, <code>proyectos.html</code>) y enlazarlos desde tu <code>index.html</code>. Ejemplo: <code>&lt;a href="contacto.html"&gt;Ir a Contacto&lt;/a&gt;</code>. Luego súbelos todos juntos a GitHub en el paso 3.</span></div>
+
+        <button class="check-btn" onclick="markDone(this, 6)">✔ Completé este paso</button>
+      </div>
+    </div>
+
+    <!-- ── REFERENCIA RÁPIDA ── -->
+    <div style="background:var(--card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 16px 16px 0;padding:24px;margin-bottom:28px;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;">⚡ Resumen: lo que aprendiste</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+        <div style="background:var(--bg);border-radius:10px;padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:6px;">📌 Para publicar</div>
+          <div style="font-size:12px;color:var(--muted);">
+            1. Crea cuenta en github.com<br>
+            2. Crea repo: github.com/new<br>
+            3. Sube tu index.html<br>
+            4. Settings → Pages → main<br>
+            5. Espera 2 min<br>
+            6. ¡Abrí el link!
+          </div>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:6px;">📌 Para actualizar</div>
+          <div style="font-size:12px;color:var(--muted);">
+            1. Abre el archivo<br>
+            2. Haz clic en ✏️<br>
+            3. Edita el código<br>
+            4. Commit changes<br>
+            5. Espera 1 min<br>
+            6. Recarga la página
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--code-bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+        <div class="code-header"><span class="code-label">Tu link de publicación</span></div>
+        <pre style="text-align:center;font-size:16px;padding:20px;"><code><span class="str">https://tu-usuario.github.io/mi-primera-pagina/</span></code></pre>
+      </div>
+    </div>
+
+    <!-- ── BANNER FINAL ── -->
+    <div class="final-banner" id="finalBanner" style="display:none;">
+      <span class="final-emoji">🚀</span>
+      <h2>¡Completaste los 7 pasos!</h2>
+      <p>Ahora tienes una página web pública en Internet gracias a GitHub Pages. Puedes compartir el link con quien quieras, actualizarla cuando gustes, y crear muchos más proyectos. Todo gratis, sin anuncios, y para siempre.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="https://pages.github.com" target="_blank" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--accent);padding:10px 22px;border-radius:999px;text-decoration:none;font-weight:600;font-size:13px;">📖 Más sobre GitHub Pages</a>
+        <a href="https://github.com" target="_blank" style="background:rgba(225,29,72,.1);border:1px solid rgba(225,29,72,.25);color:var(--accent2);padding:10px 22px;border-radius:999px;text-decoration:none;font-weight:600;font-size:13px;">🐙 Ir a GitHub</a>
+      </div>
+    </div>
+
+  </main>
+
+  <nav class="sidebar">
+    <div class="sidebar-title">Pasos</div>
+    <a class="nav-item" data-step="0" href="#step-0"><span class="num">0</span> Crear cuenta</a>
+    <a class="nav-item" data-step="1" href="#step-1"><span class="num">1</span> Repositorio</a>
+    <a class="nav-item" data-step="2" href="#step-2"><span class="num">2</span> index.html</a>
+    <a class="nav-item" data-step="3" href="#step-3"><span class="num">3</span> Subir archivos</a>
+    <a class="nav-item" data-step="4" href="#step-4"><span class="num">4</span> Activar Pages</a>
+    <a class="nav-item" data-step="5" href="#step-5"><span class="num">5</span> Ver página</a>
+    <a class="nav-item" data-step="6" href="#step-6"><span class="num">6</span> Actualizar</a>
+  </nav>
+
+</div>
+
+<script>
+  const TOTAL_STEPS = 7;
+  const done = new Array(TOTAL_STEPS).fill(false);
+
+  function toggleStep(header) {
+    const card = header.closest('.step-card');
+    card.classList.toggle('open');
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copiado';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  function markDone(btn, idx) {
+    done[idx] = true;
+    btn.textContent = '✅ ¡Completado!';
+    btn.classList.add('done-btn');
+    btn.disabled = true;
+
+    const card = btn.closest('.step-card');
+    card.classList.add('done');
+
+    const navItem = document.querySelector(`.nav-item[data-step="${idx}"]`);
+    if (navItem) { navItem.classList.add('done'); }
+
+    const count = done.filter(Boolean).length;
+    document.getElementById('progressCount').textContent = count + '/7';
+
+    const dots = document.querySelectorAll('.progress-dot');
+    dots.forEach((d, i) => d.classList.toggle('filled', i < count));
+
+    const nextCard = document.getElementById('step-' + (idx + 1));
+    if (nextCard) {
+      nextCard.classList.add('open');
+      setTimeout(() => nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    }
+
+    if (count === TOTAL_STEPS) {
+      document.getElementById('finalBanner').style.display = 'block';
+      setTimeout(() => document.getElementById('finalBanner').scrollIntoView({ behavior: 'smooth' }), 400);
+    }
+  }
+
+  window.addEventListener('scroll', () => {
+    const steps = document.querySelectorAll('.step-card');
+    let current = 0;
+    steps.forEach((s, i) => {
+      const rect = s.getBoundingClientRect();
+      if (rect.top < 150) current = i;
+    });
+    document.querySelectorAll('.nav-item').forEach((n, i) => {
+      n.classList.toggle('active', i === current);
+    });
+  });
+</script>
+</body>
+</html>
